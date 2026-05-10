@@ -1,0 +1,1 @@
+Initial JarPick MVP release with local choice jars, random picking, and an optional remove-ads upgrade.

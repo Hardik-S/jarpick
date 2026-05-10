@@ -1,0 +1,2 @@
+Create jars of choices and pick one when you can’t decide.
+

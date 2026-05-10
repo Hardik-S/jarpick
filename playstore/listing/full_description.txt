@@ -1,0 +1,12 @@
+JarPick helps you make low-stakes decisions without overthinking.
+
+Create jars for meals, chores, games, date ideas, study breaks, or any repeating choice. Add options once, then let JarPick draw one when you need a quick answer.
+
+What JarPick does:
+- Build multiple local choice jars
+- Add, edit, and remove options
+- Randomly pick from a jar
+- Keep simple everyday decisions lightweight
+- Offer an optional remove-ads upgrade
+
+JarPick is designed for casual personal use. It does not make medical, financial, legal, safety, or other high-stakes recommendations.

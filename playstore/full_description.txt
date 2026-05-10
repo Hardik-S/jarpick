@@ -1,0 +1,29 @@
+JarPick is a simple random decision maker for everyday choices.
+
+Create jars for dinner ideas, movies, chores, study tasks, games, date nights, weekend plans, or anything else. Add your options, tap to pick, and let the jar choose one.
+
+JarPick is built for small, low-stakes decisions that waste too much time.
+
+Features:
+• Create custom choice jars
+• Add your own options
+• Tap to pick a random result
+• Avoid immediate repeats
+• View recent pick history
+• Use starter jars for dinner, chores, movies, study, and weekends
+• Works without an account
+• Stores your jars locally on your device
+• Optional $2.99 premium upgrade removes ads and unlocks more features
+
+Premium unlocks:
+• No ads
+• Unlimited jars
+• Unlimited choices
+• Weighted picks
+• No-repeat mode
+• Elimination mode
+• Premium themes
+• Full pick history
+
+JarPick is not for gambling, lotteries, raffles, or prize drawings. It is a lightweight decision helper for everyday choices.
+
