@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.security.MessageDigest
 
 /**
  * Billing Library 8.3.0 wrapper for JarPick's one-time ad-removal product.
@@ -213,7 +214,13 @@ class BillingManager(
 
         when (removeAdsPurchase.purchaseState) {
             Purchase.PurchaseState.PURCHASED -> {
-                _purchaseState.value = PurchaseState(isPremium = true, isPurchaseInFlight = false)
+                _purchaseState.value = PurchaseState(
+                    isPremium = true,
+                    productId = REMOVE_ADS_PRODUCT_ID,
+                    purchaseTokenHash = purchaseTokenHash(removeAdsPurchase.purchaseToken),
+                    acknowledged = removeAdsPurchase.isAcknowledged,
+                    isPurchaseInFlight = false,
+                )
                 acknowledgeIfNeeded(removeAdsPurchase)
             }
             Purchase.PurchaseState.PENDING -> {
@@ -253,6 +260,11 @@ class BillingManager(
         _billingState.value = BillingState.Unavailable(message)
     }
 
+    private fun purchaseTokenHash(token: String): String {
+        val digest = MessageDigest.getInstance("SHA-256").digest(token.toByteArray())
+        return digest.joinToString(separator = "") { "%02x".format(it) }
+    }
+
     private fun BillingResult.isOk(): Boolean =
         responseCode == BillingClient.BillingResponseCode.OK
 
@@ -272,6 +284,9 @@ sealed interface BillingState {
 
 data class PurchaseState(
     val isPremium: Boolean = false,
+    val productId: String = "",
+    val purchaseTokenHash: String = "",
+    val acknowledged: Boolean = false,
     val isPending: Boolean = false,
     val isPurchaseInFlight: Boolean = false,
     val lastError: String? = null,

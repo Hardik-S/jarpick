@@ -109,13 +109,13 @@ Expected output:
 app/build/outputs/bundle/release/app-release.aab
 ```
 
-If no release keystore is configured, debug builds still work. A Play-ready release AAB requires valid signing material outside git.
+If no release keystore is configured, Gradle falls back to debug signing so `bundleRelease` can still produce a local AAB for inspection. A Play-ready release AAB requires valid release signing material outside git.
 
 ## Google Play Submission Caveats
 
 Before submission, validate:
 
-- Manifest only requests `INTERNET`.
+- The first-party manifest only requests `INTERNET`; Ads/Billing SDK merged permissions must be reviewed in the final Play Console Data Safety form.
 - AdMob app ID and production banner unit are configured.
 - Billing product `remove_ads_premium` is active.
 - The app is not listed as children-directed.
