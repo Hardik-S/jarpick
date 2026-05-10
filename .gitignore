@@ -1,0 +1,19 @@
+# Gradle and Android build output
+.gradle/
+build/
+**/build/
+
+# Local machine and signing material
+local.properties
+*.jks
+*.keystore
+keystore.properties
+
+# IDE files
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
