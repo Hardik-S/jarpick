@@ -8,6 +8,7 @@ local.properties
 *.jks
 *.keystore
 keystore.properties
+.vercel
 
 # IDE files
 .idea/
@@ -16,4 +17,3 @@ keystore.properties
 # OS files
 .DS_Store
 Thumbs.db
-

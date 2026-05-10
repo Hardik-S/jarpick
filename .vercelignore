@@ -1,0 +1,24 @@
+# Vercel only hosts the lightweight privacy/support website in site/.
+# Keep Android build inputs, Gradle caches, and generated outputs out of
+# deployment uploads so future Vercel runs stay small and account-safe.
+
+.git
+.gradle
+.kotlin
+app
+build
+gradle
+
+*.aab
+*.apk
+*.jks
+*.keystore
+local.properties
+
+README.md
+playstore
+gradlew
+gradlew.bat
+settings.gradle.kts
+build.gradle.kts
+gradle.properties

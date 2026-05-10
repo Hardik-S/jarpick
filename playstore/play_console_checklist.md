@@ -24,8 +24,8 @@ IDs, or Play Console secrets.
 - [ ] What's new: use `playstore/listing/whats_new.txt`.
 - [ ] Upload at least two phone screenshots from the release-like build.
 - [ ] Upload the 1024 x 500 feature graphic from `playstore/assets/feature_graphic.png`.
-- [ ] Privacy policy URL: use the Vercel `/privacy` URL after deployment.
-- [ ] Developer website URL: use the Vercel root URL after deployment.
+- [ ] Privacy policy URL: `https://jarpick.vercel.app/privacy`.
+- [ ] Developer website URL: `https://jarpick.vercel.app/`.
 - [ ] Support email: `hshrestha.hba2026@ivey.ca`.
 
 ## App Content

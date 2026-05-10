@@ -162,9 +162,9 @@ The static developer site lives in `site/` and is configured by `vercel.json`.
 
 Routes:
 
-- `/` - JarPick overview.
-- `/privacy` - Play Console privacy policy URL.
-- `/support` - support contact page.
+- `/` - JarPick overview at `https://jarpick.vercel.app/`.
+- `/privacy` - Play Console privacy policy URL at `https://jarpick.vercel.app/privacy`.
+- `/support` - support contact page at `https://jarpick.vercel.app/support`.
 
 Before launch, replace the publisher placeholder in `site/app-ads.template.txt`, publish it as `/app-ads.txt`, and verify AdMob's app-ads.txt crawler sees the authorized seller line.
 
