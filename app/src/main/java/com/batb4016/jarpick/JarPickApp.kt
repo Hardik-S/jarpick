@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -227,17 +229,18 @@ private fun EditJarScreen(onSave: (String) -> Unit, onBack: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun JarDetailScreen(state: JarPickUiState, onBack: () -> Unit, onPick: () -> Unit, onAddOption: () -> Unit, onMode: (DecisionMode) -> Unit, onPremium: () -> Unit, onReset: () -> Unit) {
     val jar = state.selectedJar
     AppScaffold(jar?.jar?.name ?: "Jar", onBack = onBack, bottom = { JarPickBannerAd(state.isPremium, JarPickAdSurface.JarDetail, Modifier.fillMaxWidth()) }) {
         if (jar == null) EmptyState("Pick a jar to continue.", "Back to jars", onBack) else {
             val activeCount = state.selectedOptions.count { it.archivedAt == null }
-            Text("$activeCount choices")
+            Text("$activeCount ${if (activeCount == 1) "choice" else "choices"}")
             if (!state.isPremium && activeCount >= 20) Text("Free jars can hold 25 choices. Upgrade for unlimited choices.", color = MaterialTheme.colorScheme.primary)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 DecisionMode.entries.forEach { mode ->
-                    FilterChip(selected = jar.jar.mode == mode.name, onClick = { if (state.isPremium || mode == DecisionMode.FAIR) onMode(mode) else onPremium() }, label = { Text(mode.name.replace('_', ' ')) })
+                    FilterChip(selected = jar.jar.mode == mode.name, onClick = { if (state.isPremium || mode == DecisionMode.FAIR) onMode(mode) else onPremium() }, label = { Text(mode.displayName()) })
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -410,4 +413,11 @@ private fun jarIcon(icon: String): String = when (icon) {
     "study" -> "✎"
     "game" -> "🎲"
     else -> "◌"
+}
+
+private fun DecisionMode.displayName(): String = when (this) {
+    DecisionMode.FAIR -> "Fair"
+    DecisionMode.WEIGHTED -> "Weighted"
+    DecisionMode.NO_REPEAT_UNTIL_EMPTY -> "No repeat"
+    DecisionMode.ELIMINATION -> "Elimination"
 }
