@@ -21,5 +21,5 @@ Use this as a Play Console working draft. Confirm final answers against the impl
 
 ## Deletion
 
-- Users can delete jars/options in-app when the feature exists.
+- Users can delete local data in app settings.
 - Users can uninstall the app to remove local app data from the device.

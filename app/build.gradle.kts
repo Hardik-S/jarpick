@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+import org.gradle.api.GradleException
 import java.util.Properties
 
 val localProperties = Properties().apply {
@@ -14,9 +15,27 @@ val localProperties = Properties().apply {
     }
 }
 
-val releaseStoreFilePath = System.getenv("JARPICK_RELEASE_STORE_FILE")
-    ?: localProperties.getProperty("JARPICK_RELEASE_STORE_FILE")
-val hasReleaseSigning = !releaseStoreFilePath.isNullOrBlank()
+fun releaseProperty(name: String): String? =
+    (System.getenv(name)
+        ?: localProperties.getProperty(name)
+        ?: providers.gradleProperty(name).orNull)
+        ?.trim()
+        ?.takeIf { it.isNotEmpty() }
+
+val releaseStoreFilePath = releaseProperty("JARPICK_RELEASE_STORE_FILE")
+val releaseStorePassword = releaseProperty("JARPICK_RELEASE_STORE_PASSWORD")
+val releaseKeyAlias = releaseProperty("JARPICK_RELEASE_KEY_ALIAS")
+val releaseKeyPassword = releaseProperty("JARPICK_RELEASE_KEY_PASSWORD")
+val productionAdMobAppId = releaseProperty("ADMOB_APP_ID")
+val productionBannerId = releaseProperty("ADMOB_BANNER_ID")
+val debugAdMobAppId = "ca-app-pub-3940256099942544~3347511713"
+val debugBannerId = "ca-app-pub-3940256099942544/9214589741"
+val hasReleaseSigning = listOf(
+    releaseStoreFilePath,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword,
+).all { !it.isNullOrBlank() }
 
 android {
     namespace = "com.batb4016.jarpick"
@@ -30,24 +49,19 @@ android {
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val productionBannerId = localProperties.getProperty("ADMOB_BANNER_ID")
-            ?: providers.gradleProperty("ADMOB_BANNER_ID").orNull
-            ?: ""
-        buildConfigField("String", "ADMOB_PRODUCTION_BANNER_ID", "\"$productionBannerId\"")
-        buildConfigField("String", "ADMOB_DEBUG_BANNER_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
+        buildConfigField("String", "ADMOB_PRODUCTION_BANNER_ID", "\"${productionBannerId.orEmpty()}\"")
+        buildConfigField("String", "ADMOB_DEBUG_BANNER_ID", "\"$debugBannerId\"")
         buildConfigField("String", "PREMIUM_PRODUCT_ID", "\"remove_ads_premium\"")
+        manifestPlaceholders["adMobApplicationId"] = debugAdMobAppId
     }
 
     signingConfigs {
         create("releaseEnv") {
             if (hasReleaseSigning) {
                 storeFile = file(releaseStoreFilePath!!)
-                storePassword = System.getenv("JARPICK_RELEASE_STORE_PASSWORD")
-                    ?: localProperties.getProperty("JARPICK_RELEASE_STORE_PASSWORD")
-                keyAlias = System.getenv("JARPICK_RELEASE_KEY_ALIAS")
-                    ?: localProperties.getProperty("JARPICK_RELEASE_KEY_ALIAS")
-                keyPassword = System.getenv("JARPICK_RELEASE_KEY_PASSWORD")
-                    ?: localProperties.getProperty("JARPICK_RELEASE_KEY_PASSWORD")
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
             }
         }
     }
@@ -57,17 +71,19 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             buildConfigField("Boolean", "ALLOW_DEBUG_PREMIUM_OVERRIDE", "true")
+            manifestPlaceholders["adMobApplicationId"] = debugAdMobAppId
         }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             buildConfigField("Boolean", "ALLOW_DEBUG_PREMIUM_OVERRIDE", "false")
+            manifestPlaceholders["adMobApplicationId"] = productionAdMobAppId.orEmpty()
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Local CI-free MVP builds must still produce an AAB. Play uploads
-            // should configure releaseEnv with a real keystore before submission.
+            // Keep the fallback for Gradle sync, but validatePlayReleaseConfig
+            // blocks any release build from shipping with debug signing.
             signingConfig = if (hasReleaseSigning) {
                 signingConfigs.getByName("releaseEnv")
             } else {
@@ -120,4 +136,50 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     testImplementation("app.cash.turbine:turbine:1.2.0")
+}
+
+tasks.register("validatePlayReleaseConfig") {
+    group = "verification"
+    description = "Fails Play release builds unless signing and production AdMob values are configured."
+
+    doLast {
+        val errors = mutableListOf<String>()
+
+        if (!hasReleaseSigning) {
+            errors += "Configure JARPICK_RELEASE_STORE_FILE, JARPICK_RELEASE_STORE_PASSWORD, JARPICK_RELEASE_KEY_ALIAS, and JARPICK_RELEASE_KEY_PASSWORD."
+        }
+        if (!releaseStoreFilePath.isNullOrBlank() && !file(releaseStoreFilePath).isFile) {
+            errors += "JARPICK_RELEASE_STORE_FILE does not point to a readable keystore: $releaseStoreFilePath"
+        }
+        if (productionAdMobAppId.isNullOrBlank()) {
+            errors += "Configure ADMOB_APP_ID with the production AdMob Android app ID."
+        }
+        if (productionAdMobAppId == debugAdMobAppId) {
+            errors += "ADMOB_APP_ID must not use Google's public test app ID."
+        }
+        if (productionBannerId.isNullOrBlank()) {
+            errors += "Configure ADMOB_BANNER_ID with the production AdMob banner ad unit ID."
+        }
+        if (productionBannerId == debugBannerId) {
+            errors += "ADMOB_BANNER_ID must not use Google's public test banner ad unit ID."
+        }
+
+        if (errors.isNotEmpty()) {
+            throw GradleException(
+                "Play release configuration is incomplete:\n" +
+                    errors.joinToString(separator = "\n") { "- $it" }
+            )
+        }
+    }
+}
+
+fun requestedPlayReleaseArtifact(): Boolean =
+    gradle.startParameter.taskNames
+        .map { it.substringAfterLast(":").lowercase() }
+        .any { it == "bundlerelease" || it == "assemblerelease" }
+
+tasks.configureEach {
+    if (requestedPlayReleaseArtifact() && (name == "preReleaseBuild" || name == "bundleRelease" || name == "assembleRelease")) {
+        dependsOn("validatePlayReleaseConfig")
+    }
 }

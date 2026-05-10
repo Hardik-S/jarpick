@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500" role="img" aria-labelledby="title desc">
+  <title id="title">JarPick feature graphic</title>
+  <desc id="desc">A calm feature graphic with a jar of folded choice slips and JarPick branding.</desc>
+  <rect width="1024" height="500" fill="#fffaf1"/>
+  <circle cx="778" cy="132" r="82" fill="#f2b84b" opacity="0.28"/>
+  <circle cx="226" cy="382" r="108" fill="#8dc4be" opacity="0.28"/>
+  <g transform="translate(624 84)">
+    <rect x="82" y="0" width="184" height="34" rx="10" fill="#f7d27a" stroke="#2f6f73" stroke-width="10"/>
+    <path d="M86 42h176c32 0 58 26 58 58v214c0 42-34 76-76 76H104c-42 0-76-34-76-76V100c0-32 26-58 58-58z" fill="#ffffff" opacity="0.82" stroke="#2f6f73" stroke-width="12"/>
+    <rect x="78" y="112" width="128" height="42" rx="10" fill="#f2b84b" transform="rotate(-9 142 133)"/>
+    <rect x="154" y="176" width="132" height="42" rx="10" fill="#805b9b" transform="rotate(12 220 197)"/>
+    <rect x="86" y="244" width="146" height="42" rx="10" fill="#8dc4be" transform="rotate(8 159 265)"/>
+    <rect x="142" y="304" width="124" height="42" rx="10" fill="#f2b84b" transform="rotate(-14 204 325)"/>
+  </g>
+  <g transform="translate(96 122)">
+    <text x="0" y="0" fill="#805b9b" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="800">RANDOM CHOICE JARS</text>
+    <text x="0" y="100" fill="#183033" font-family="Inter, Arial, sans-serif" font-size="94" font-weight="900">JarPick</text>
+    <text x="2" y="166" fill="#5b696b" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="600">Pick from everyday choices without overthinking.</text>
+    <rect x="4" y="210" width="282" height="58" rx="14" fill="#2f6f73"/>
+    <text x="34" y="249" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="800">Random Choice Jars</text>
+  </g>
+</svg>

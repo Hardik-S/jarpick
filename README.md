@@ -50,15 +50,16 @@ Current unit coverage focuses on the decision engine, free/premium limit logic, 
 
 JarPick uses banner ads only in v1. Ads are blocked on onboarding, pick animation, result, premium, and settings screens.
 
-For release, put the production banner unit in `local.properties` or a Gradle property:
+For release, put both the production AdMob Android app ID and production banner unit in `local.properties` or Gradle/environment properties:
 
 ```properties
+ADMOB_APP_ID=ca-app-pub-your-production-id~your-app-id
 ADMOB_BANNER_ID=ca-app-pub-your-production-id/your-banner-id
 ```
 
 Do not commit AdMob account secrets, Play Console credentials, keystores, or passwords.
 
-Gradle exposes the production banner through `BuildConfig.ADMOB_PRODUCTION_BANNER_ID`. The wrapper also accepts `ADMOB_BANNER_AD_UNIT_ID` as a future generic fallback, but the current skeleton uses `ADMOB_PRODUCTION_BANNER_ID`.
+Gradle injects the production AdMob app ID into the Android manifest and exposes the production banner through `BuildConfig.ADMOB_PRODUCTION_BANNER_ID`. Debug builds always use Google's public test AdMob app and banner IDs. Release builds run `validatePlayReleaseConfig` and fail if either production AdMob value is missing or still set to a public test ID.
 
 ## Configure Play Billing
 
@@ -93,7 +94,9 @@ JARPICK_RELEASE_KEY_ALIAS=...
 JARPICK_RELEASE_KEY_PASSWORD=...
 ```
 
-The repository ignores keystores, `local.properties`, and signing property files. Never commit keystores or passwords.
+The repository ignores keystores, `local.properties`, and signing property files. Never commit keystores or passwords. Use `local.properties.example` as the local release-machine template.
+
+JarPick's Play upload path assumes Play App Signing is enabled in Play Console with Google's generated app signing key. The local keystore should be the upload key for signing `app-release.aab` before upload.
 
 ## Build The App Bundle
 
@@ -109,7 +112,11 @@ Expected output:
 app/build/outputs/bundle/release/app-release.aab
 ```
 
-If no release keystore is configured, Gradle falls back to debug signing so `bundleRelease` can still produce a local AAB for inspection. A Play-ready release AAB requires valid release signing material outside git.
+`bundleRelease` is intentionally blocked until the release keystore and production AdMob values are configured. This prevents accidentally uploading a debug-signed or test-ad build to Play. The matching R8 mapping file for Play Console is:
+
+```text
+app/build/outputs/mapping/release/mapping.txt
+```
 
 ## Google Play Submission Caveats
 
@@ -121,6 +128,8 @@ Before submission, validate:
 - The app is not listed as children-directed.
 - Store copy avoids gambling, raffle, lottery, betting, prize, health, finance, medical, legal, dating, or regulated claims.
 - Data Safety answers match the final SDK list and shipped behavior.
+- New personal developer accounts complete the required closed test with at least 12 opted-in testers for 14 continuous days before applying for production access.
+- The hosted privacy policy and support site are live on Vercel before the Play listing is submitted.
 
 ## Play Store Drafts
 
@@ -133,6 +142,9 @@ Play Store files live in `playstore/`:
 - `playstore/data_safety_notes.md`
 - `playstore/screenshot_plan.md`
 - `playstore/feature_graphic_brief.md`
+- `playstore/play_console_checklist.md`
+- `playstore/release_qa_checklist.md`
+- `playstore/admob_billing_setup.md`
 
 Additional working notes under `playstore/listing/`, `playstore/privacy/`, and `playstore/assets/` were kept as drafts, but the root `playstore/` files above are the submission-facing artifacts requested for this MVP.
 
@@ -141,6 +153,20 @@ The nested drafts are organized by Play Console area:
 - `playstore/listing/` contains listing text drafts.
 - `playstore/privacy/` contains privacy policy and data-safety drafts.
 - `playstore/assets/` contains screenshot and feature graphic production notes.
+- `playstore/assets/feature_graphic.svg` is the editable 1024 x 500 source graphic.
+- `playstore/assets/feature_graphic.png` is the current 1024 x 500 Play upload candidate.
+
+## Vercel Support Site
+
+The static developer site lives in `site/` and is configured by `vercel.json`.
+
+Routes:
+
+- `/` - JarPick overview.
+- `/privacy` - Play Console privacy policy URL.
+- `/support` - support contact page.
+
+Before launch, replace the publisher placeholder in `site/app-ads.template.txt`, publish it as `/app-ads.txt`, and verify AdMob's app-ads.txt crawler sees the authorized seller line.
 
 ## Architecture Notes
 

@@ -1,0 +1,3 @@
+# Replace pub-0000000000000000 with the AdMob publisher ID before launch,
+# then publish this file as /app-ads.txt on the verified developer website.
+google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

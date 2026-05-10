@@ -1,6 +1,6 @@
 # JarPick Privacy Policy Draft
 
-Last updated: 2026-05-10
+Last updated: May 10, 2026
 
 JarPick is an Android app for creating local jars of choices and randomly selecting an option.
 
@@ -26,4 +26,4 @@ JarPick is intended as a general utility. Do not enter sensitive personal inform
 
 ## Contact
 
-For privacy questions, contact the developer through the support email listed on Google Play.
+For privacy questions, contact `hshrestha.hba2026@ivey.ca`.
